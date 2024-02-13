@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      width: 100vw;
+      height: 100vh
+    }
+
+    body {
+      background: #000;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .wrapper {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /*style modals*/
+
+    .game-wrapper {
+      position: relative;
+    }
+
+    .game-menu {
+      position: absolute;
+      z-index: 10;
+      width: 100%;
+      height: 100%;
+      background: rgba(39, 37, 37, 0.9);
+      display: flex;
+      flex-direction: column;
+      row-gap: 20px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .game-wrapper button {
+      background: transparent;
+      border: 0;
+      color: #000;
+      font-size: 30px;
+      transition: all 0.3s ease 0s;
+      cursor: pointer;
+      background: #fff;
+      padding: 5px 20px;
+      box-shadow: 5px 5px 0 0 rgba(255, 0, 0, 0.7);
+    }
+
+    .game-menu.hidden {
+      display: none;
+    }
+
+    .game-wrapper button:hover {
+      box-shadow: none;
+    }
+
+    @media (max-width: 540px) {
+      .game-wrapper {
+        transform: scale(0.7);
+      }
+    }
+
+    @media (max-width: 360px) {
+      .game-wrapper {
+        transform: scale(0.6);
+      }
+    }
+
+    .game-lose {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      row-gap: 20px;
+      z-index: 10;
+      width: 100%;
+      height: 100%;
+      background: rgba(39, 37, 37, 0.9);
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 30px;
+      display: none;
+    }
+
+    .game-lose.visible {
+      display: flex;
+    }
+
+    .game-lose-close {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 20px;
+      color: #fff;
+      transition: all 0.3s ease 0s;
+      cursor: pointer;
+    }
+
+    .game-lose-close:hover {
+      color: red;
+    }
+
+    .game-menu {
+      position: absolute;
+    }
+
+
+    /*style notice*/
+    .notice {
+      position: absolute;
+      left: 10px;
+      top: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      display: none;
+    }
+
+    ._pc .notice {
+      display: flex;
+    }
+
+    .notice-title {
+      margin: 20px 0;
+      color: #fff;
+      text-align: center;
+      font-size: 50px;
+    }
+
+    .notice-buttons {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .notice-buttons-move {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-template-rows: repeat(2, 100px);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .notice button {
+      background: transparent;
+      border: 5px solid #fff;
+      color: #fff;
+      font-size: 50px;
+      font-weight: 800;
+      width: 100px;
+      height: 100px;
+    }
+
+    .notice .pause {
+      font-size: 40px;
+    }
+
+    .notice button:nth-child(1) {
+      grid-column: 2;
+    }
+
+    .notice button:nth-child(2) {
+      grid-column: 1;
+      grid-row: 2;
+    }
+
+    .notice button:nth-child(3) {
+      grid-column: 2;
+      grid-row: 2;
+    }
+
+    .notice button:nth-child(4) {
+      grid-column: 3;
+      grid-row: 2;
+    }
+
+    @media (max-width: 992px) {
+      .notice {
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+    }
+
+    /*contoller*/
+
+    .controller {
+      grid-template-columns: repeat(3, 70px);
+      grid-template-rows: repeat(3, 70px);
+      display: none;
+    }
+
+    @media (max-height: 740px) {
+      .controller {
+        transform: translateY(calc(100vh * -0.08));
+      }
+    }
+
+    ._touch .controller {
+      display: grid;
+    }
+
+    .controller button {
+      width: 70px;
+      font-size: 40px;
+      height: 70px;
+    }
+
+    .controller button:active {
+      transform: scale(0.95);
+    }
+
+    .controller button:nth-child(1) {
+      grid-row: 1;
+      grid-column: 2;
+    }
+
+    .controller button:nth-child(2) {
+      grid-row: 2;
+      grid-column: 1;
+    }
+
+    .controller button:nth-child(3) {
+      grid-row: 2;
+      grid-column: 3;
+    }
+
+    .controller button:nth-child(4) {
+      grid-row: 3;
+      grid-column: 2;
+    }
+
+    /*style game */
+
+    .game-body {
+      position: relative;
+      width: 495px;
+      height: 495px;
+      padding: 5px;
+      display: grid;
+      grid-template-columns: repeat(20, 20px);
+      grid-template-rows: repeat(20, 20px);
+      justify-content: center;
+      gap: 5px;
+      background-color: rgba(0, 0, 0, 0.96);
+    }
+
+
+    .game-body .line {
+      position: absolute;
+      background-color: #fff;
+    }
+
+    .game-body .line:nth-child(1),
+    .game-body .line:nth-child(2) {
+      width: 1px;
+      height: calc(100% - 25px);
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .game-body .line:nth-child(1) {
+      left: 0;
+    }
+
+    .game-body .line:nth-child(2) {
+      right: 0;
+    }
+
+    .game-body .line:nth-child(3),
+    .game-body .line:nth-child(4) {
+      height: 1px;
+      width: calc(100% - 25px);
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .game-body .line:nth-child(3) {
+      top: 0;
+    }
+
+    .game-body .line:nth-child(4) {
+      bottom: 0;
+    }
+
+    .game-body .snake {
+      background-color: #fff;
+      position: relative;
+      z-index: 2;
+    }
+
+    .game-body .head::after,
+    .game-body .head::before {
+      content: '';
+      position: absolute;
+      width: 2px;
+      height: 8px;
+      right: 4px;
+      background: #000;
+    }
+
+    .game-body .head::after {
+      top: 0;
+    }
+
+    .game-body .head::before {
+      bottom: 0;
+    }
+
+    .game-body .berry {
+      background-color: red;
+      position: relative;
+      z-index: 1;
+    }
+
+    .game-body .score {
+      position: absolute;
+      top: -25px;
+      right: 10px;
+      color: #fff;
+      font-size: 25px;
+    }
+  </style>
+  <title>Snake</title>
+</head>
+
+<body>
+
+
+  <div class="wrapper">
+
+    <div class="notice">
+
+      <h2 class="notice-title">Pause</h2>
+      <button class="pause">
+        Esc
+      </button>
+
+      <h2 class="notice-title">Move</h2>
+
+      <div class="notice-buttons-move">
+        <button>
+          W
+        </button>
+        <button>
+          A
+        </button>
+        <button>
+          S
+        </button>
+        <button>
+          D
+        </button>
+      </div>
+
+      <div class="notice-buttons-move">
+        <button>
+          &uarr;
+        </button>
+        <button>
+          &larr;
+        </button>
+        <button>
+          &darr;
+        </button>
+        <button>
+          &rarr;
+        </button>
+      </div>
+    </div>
+
+    <div class="game-wrapper">
+
+      <div class="game-menu">
+        <button onclick="menuStart()">Start</button>
+        <button onclick="location.reload()">Reset</button>
+      </div>
+
+      <div class="game-lose">
+        <div class="game-lose-close" onclick="loseClose()">X</div>
+        <span>You lose</span>
+        <button onclick="location.reload()">Reset</button>
+
+      </div>
+
+      <div id="game">
+
+      </div>
+    </div>
+
+    <div class="controller">
+      <button class="controller-button" onclick="rotateUp()">/\</button>
+      <button class="controller-button" onclick="rotateLeft()">
+        < </button>
+          <button class="controller-button" onclick="rotateRight()">></button>
+          <button class="controller-button" onclick="rotateDown()">\/</button>
+
+    </div>
+  </div>
+
+  <script>
+    class Eat {
+      constructor() {
+        this.berry = null;
+      }
+      spawn() {
+        this.berry = document.createElement('div')
+        this.berry.classList.add('berry')
+      }
+      remove() {
+        this.berry.remove()
+      }
+    }
+
+    class Snake {
+      constructor() {
+        this.elements = []
+        this.moveInterval = null
+        this.death = false
+        this.rotatePos = []
+        this.rotateState = false
+      }
+
+      spawn() {
+        const names = ['head', 'body1', 'body2']
+        const params = {
+          head: {
+            x: 4,
+            y: 4,
+            move: 'r'
+          },
+          body1: {
+            x: 3,
+            y: 4,
+            move: 'r'
+          },
+          body2: {
+            x: 2,
+            y: 4,
+            move: 'r'
+          },
+        }
+
+        for (let i = 0; i < names.length; i++) {
+          const element = document.createElement('div')
+          element.classList.add(names[i])
+          element.classList.add('snake')
+          element.classList.add('body')
+
+          Object.assign(element, params[names[i]])
+
+          this.elements.push(element)
+        }
+
+        this.head = this.elements[0]
+
+        return this.elements
+
+      }
+
+      move() {
+        this.moveInterval = setInterval(() => {
+          if (this.end()) {
+            return
+          }
+
+
+          for (let index = 0; index < this.elements.length; index++) {
+
+            if (this.elements[index].move == 'r') {
+              ++this.elements[index].x
+            } else if (this.elements[index].move == 'l') {
+              --this.elements[index].x
+            } else if (this.elements[index].move == 'u') {
+              --this.elements[index].y
+            } else if (this.elements[index].move == 'd') {
+              ++this.elements[index].y
+            }
+
+
+            this.elements[index].style.gridColumn = `${this.elements[index].x}`
+            this.elements[index].style.gridRow = `${this.elements[index].y}`
+
+            const rotateIndex = this.rotatePos.findIndex(el => el = el.x == this.elements[index].x && el.y == this.elements[index].y)
+            if (-1 < rotateIndex) {
+              this.elements[index].move = this.rotatePos[rotateIndex].move
+              ++this.rotatePos[rotateIndex].count
+
+              if (this.rotatePos[rotateIndex].count == this.elements.length) {
+                this.rotatePos.splice(rotateIndex, 1)
+              }
+            }
+          }
+
+
+          if (this.observer.eat.berry.x == this.head.x && this.observer.eat.berry.y == this.head.y) {
+            this.observer.eatBerry()
+            this.grow()
+          }
+          this.rotateState = false
+        }, 200)
+      }
+
+      rotate(side) {
+        if (!this.rotateState && !this.death) {
+          if ((side == 'u' && this.head.move == 'd')
+            || (side == 'd' && this.head.move == 'u')
+            || (side == 'l' && this.head.move == 'r')
+            || (side == 'r' && this.head.move == 'l')
+            || side == this.head.move) {
+            return
+          }
+          this.rotateState = true
+
+          this.rotatePos.push({
+            x: this.head.x,
+            y: this.head.y,
+            move: side,
+            count: 1
+          })
+
+          this.head.move = side
+
+          this.head.style.transform = `rotate(${side == 'r' ? 0 : side == 'd' ? 90 : side == 'l' ? 180 : side == 'u' ? 270 : ''}deg)`
+        }
+      }
+
+      end() {
+
+        if ((this.head.move == 'r' && (this.elements.find(el => el.x == this.head.x + 1 && el.y == this.head.y) || this.head.x + 1 >= 21))
+          || (this.head.move == 'l' && (this.elements.find(el => el.x == this.head.x - 1 && el.y == this.head.y) || this.head.x - 1 <= 0))
+          || (this.head.move == 'u' && (this.elements.find(el => el.x == this.head.x && el.y == this.head.y - 1) || this.head.y - 1 <= 0))
+          || (this.head.move == 'd' && (this.elements.find(el => el.x == this.head.x && el.y == this.head.y + 1) || this.head.y + 1 >= 21))) {
+          console.log('end');
+          this.death = true
+          this.stop()
+          this.observer.onLose()
+          return true
+        }
+
+        return false
+      }
+
+      stop() {
+        clearInterval(this.moveInterval)
+      }
+
+      grow() {
+        const end = this.elements[this.elements.length - 1]
+
+        const element = document.createElement('div')
+        element.classList.add('body')
+        element.classList.add('snake')
+
+        element.move = end.move
+        element.x = end.move == 'r' ? end.x - 1 : end.move == 'l' ? end.x + 1 : end.x
+        element.y = end.move == 'u' ? end.y + 1 : end.move == 'd' ? end.y - 1 : end.y
+
+        this.elements.push(element)
+
+        this.observer.growRender()
+      }
+    }
+
+    class Game {
+      constructor(element) {
+        this.positions = []
+
+        this.body = document.querySelector(element)
+        this.body.classList.add('game-body')
+        this.pauseState = true
+
+        this.score = document.createElement('span')
+        this.score.classList.add('score')
+        this.score.textContent = 0
+
+
+        for (let x = 1; x < 21; x++) {
+          for (let y = 1; y < 21; y++) {
+            {
+              this.positions.push({
+                x,
+                y
+              })
+            }
+          }
+        }
+
+        Array.from(new Array(4)).forEach(() => {
+          const line = document.createElement('line')
+          line.classList.add('line')
+          this.body.appendChild(line)
+        })
+
+        this.body.appendChild(this.score)
+
+        this.keyEvents()
+
+        this.eat = new Eat()
+        this.snake = new Snake()
+        this.snake.observer = this
+        this.spawnSnake()
+        this.spawnEat()
+        this.pauseState = false
+      }
+
+      start() {
+        this.snake.move()
+      }
+      pause() {
+        this.snake.stop()
+      }
+
+      keyEvents() {
+        window.addEventListener('keyup', (event) => {
+          // if (event.code == 'Space') {
+          //   this.pauseState = !this.pauseState
+          //   if (!this.pauseState) {
+          //     this.start()
+          //   } else {
+          //     this.pause()
+          //   }
+          // }
+
+          if (event.code == 'ArrowUp' || event.code == 'KeyW') {
+            this.snake.rotate('u');
+          }
+          if (event.code == 'ArrowRight' || event.code == 'KeyD') {
+            this.snake.rotate('r');
+          }
+          if (event.code == 'ArrowDown' || event.code == 'KeyS') {
+            this.snake.rotate('d');
+          }
+          if (event.code == 'ArrowLeft' || event.code == 'KeyA') {
+            this.snake.rotate('l');
+          }
+        })
+      }
+
+      spawnSnake() {
+        this.snake.spawn()
+        this.renderSnake()
+      }
+
+      renderSnake() {
+        for (let index = 0; index < this.snake.elements.length; index++) {
+          this.snake.elements[index].style.gridColumn = this.snake.elements[index].x
+          this.snake.elements[index].style.gridRow = this.snake.elements[index].y
+        }
+
+        this.body.append(...this.snake.elements)
+      }
+
+      spawnEat() {
+        this.eat.spawn()
+        this.renderEat()
+      }
+
+      renderEat() {
+        const emptyPositions = this.positions.filter(position => {
+          return !this.snake.elements.some(el => el.x == position.x && el.y == position.y)
+        })
+
+        const random = Math.random()
+
+        const position = emptyPositions[(emptyPositions.length * random).toFixed()]
+
+        Object.assign(this.eat.berry, position)
+        this.eat.berry.style.gridColumn = position.x
+        this.eat.berry.style.gridRow = position.y
+
+        this.body.appendChild(this.eat.berry)
+      }
+
+      eatBerry() {
+        this.eat.remove()
+        this.spawnEat()
+        this.score.textContent = Number(this.score.textContent) + 1
+      }
+
+      growRender() {
+        const element = this.snake.elements[this.snake.elements.length - 1]
+
+        element.style.gridColumn = element.x
+        element.style.gridRow = element.y
+        console.dir(element);
+        this.body.appendChild(element)
+      }
+
+      onLose() {
+        this.loseCallback ? this.loseCallback() : ''
+      }
+
+      lose(callback) {
+        this.loseCallback = callback
+      }
+
+    }
+
+
+    const game = new Game('#game')
+
+
+    let isMobile = {
+      Android: function () { return navigator.userAgent.match(/Android/i); },
+      BlackBerry: function () { return navigator.userAgent.match(/BlackBerry/i); },
+      iOS: function () { return navigator.userAgent.match(/iPhone|iPad|iPod/i); },
+      Opera: function () { return navigator.userAgent.match(/Opera Mini/i); },
+      Windows: function () { return navigator.userAgent.match(/IEMobile/i); },
+      any: function () { return (isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() || isMobile.Opera() || isMobile.Windows()); }
+    };
+
+    if (isMobile.any()) {
+      document.body.classList.add("_touch");
+    } else {
+      document.body.classList.add("_pc");
+    }
+
+    const menu = document.querySelector('.game-menu')
+    const lose = document.querySelector('.game-lose')
+
+    function menuStart() {
+      menu.classList.add('hidden')
+      game.start();
+      game.pauseState = false;
+
+    }
+
+    window.addEventListener('keyup', (event) => {
+      if (event.code == 'Escape') {
+        menu.classList.remove('hidden')
+        game.pause()
+      }
+    })
+
+    game.lose(() => {
+      lose.classList.add('visible')
+    })
+
+    function loseClose() {
+      lose.classList.remove('visible')
+    }
+
+    function rotateUp() {
+      game.snake.rotate('u')
+    }
+    function rotateRight() {
+      game.snake.rotate('r')
+    }
+    function rotateDown() {
+      game.snake.rotate('d')
+    }
+    function rotateLeft() {
+      game.snake.rotate('l')
+    }
+
+  </script>
+</body>
+
+</html>

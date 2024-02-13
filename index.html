@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="./style.css">
+  <title>Snake</title>
+</head>
+
+<body>
+
+
+  <div class="wrapper">
+
+    <div class="notice">
+
+      <h2 class="notice-title">Pause</h2>
+      <button class="pause">
+        Esc
+      </button>
+
+      <h2 class="notice-title">Move</h2>
+
+      <div class="notice-buttons-move">
+        <button>
+          W
+        </button>
+        <button>
+          A
+        </button>
+        <button>
+          S
+        </button>
+        <button>
+          D
+        </button>
+      </div>
+
+      <div class="notice-buttons-move">
+        <button>
+          &uarr;
+        </button>
+        <button>
+          &larr;
+        </button>
+        <button>
+          &darr;
+        </button>
+        <button>
+          &rarr;
+        </button>
+      </div>
+    </div>
+
+    <div class="game-wrapper">
+
+      <div class="game-menu">
+        <button onclick="menuStart()">Start</button>
+        <button onclick="location.reload()">Reset</button>
+      </div>
+
+      <div class="game-lose">
+        <div class="game-lose-close" onclick="loseClose()">X</div>
+        <span>You lose</span>
+        <button onclick="location.reload()">Reset</button>
+
+      </div>
+
+      <div id="game">
+
+      </div>
+    </div>
+
+    <div class="controller">
+      <button class="controller-button" onclick="rotateUp()">/\</button>
+      <button class="controller-button" onclick="rotateLeft()">
+        < </button>
+          <button class="controller-button" onclick="rotateRight()">></button>
+          <button class="controller-button" onclick="rotateDown()">\/</button>
+
+    </div>
+  </div>
+
+  <script src="./eat.js"></script>
+  <script src="./snake.js"></script>
+  <script src="./game.js"></script>
+  <script src="./script.js"></script>
+</body>
+
+</html>
